@@ -1,0 +1,243 @@
+---
+name: securitization-network-local
+version: "1.0"
+caliper:
+  blockchain: fabric
+organizations:
+  originator:
+    mspid: originatorMSP
+    peers:
+      - originator-peer
+    #certificateAuthorities:
+    #  - #  int.ca.org1.acme.com:
+    adminPrivateKey:
+      path: ../fabric-ca/originator/admins/originator-admin/msp/keystore/priv.key
+    signedCert:
+      path: ../fabric-ca/originator/admins/originator-admin/msp/signcerts/cert.pem
+  farmer:
+    mspid: farmerMSP
+    peers:
+      - farmer-peer
+    #certificateAuthorities:
+    #  - #  int.ca.org2.acme.com:
+    adminPrivateKey:
+      path: ../fabric-ca/farmer/admins/farmer-admin/msp/keystore/priv.key
+    signedCert:
+      path: ../fabric-ca/farmer/admins/farmer-admin/msp/signcerts/cert.pem
+  aggregator:
+    mspid: aggregatorMSP
+    peers:
+      - aggregator-peer
+    #certificateAuthorities:
+    #  - #  int.ca.org3.acme.com:
+    adminPrivateKey:
+      path: ../fabric-ca/aggregator/admins/aggregator-admin/msp/keystore/priv.key
+    signedCert:
+      path: ../fabric-ca/aggregator/admins/aggregator-admin/msp/signcerts/cert.pem
+  spv:
+    mspid: spvMSP
+    peers:
+      - spv-peer
+    #certificateAuthorities:
+    #  - #  int.ca.org3.acme.com:
+    adminPrivateKey:
+      path: ../fabric-ca/spv/admins/spv-admin/msp/keystore/priv.key
+    signedCert:
+      path: ../fabric-ca/spv/admins/spv-admin/msp/signcerts/cert.pem
+  underwritter:
+    mspid: underwritterMSP
+    peers:
+      - underwritter-peer
+    #certificateAuthorities:
+    #  - #  int.ca.org3.acme.com:
+    adminPrivateKey:
+      path: ../fabric-ca/underwritter/admins/underwritter-admin/msp/keystore/priv.key
+    signedCert:
+      path: ../fabric-ca/underwritter/admins/underwritter-admin/msp/signcerts/cert.pem
+channels:
+  securitization:
+    orderers:
+      - originator-orderer
+      - farmer-orderer
+      - aggregator-orderer
+      - spv-orderer
+      - underwritter-orderer
+    peers:
+      originator-peer:
+        eventSource: true
+      farmer-peer:
+        eventSource: true
+      aggregator-peer:
+        eventSource: true
+      spv-peer:
+        eventSource: true
+      underwritter-peer:
+        eventSource: true
+    created: true
+    chaincodes:
+      - id: securitizationcode
+        version: v1.0
+        language: golang
+clients:
+  originator-client:
+    client:
+      organization: originator
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/originator
+        cryptoStore:
+          path: tmp/hfc-kvs/originator
+      clientPrivateKey:
+        path: ../fabric-ca/originator/clients/originator-client/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../fabric-ca/originator/clients/originator-client/msp/signcerts/cert.pem
+  farmer-client-1:
+    client:
+      organization: farmer
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/farmer
+        cryptoStore:
+          path: tmp/hfc-kvs/farmer
+      clientPrivateKey:
+        path: ../fabric-ca/farmer/clients/farmer-client-1/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../fabric-ca/farmer/clients/farmer-client-1/msp/signcerts/cert.pem
+  aggregator-client:
+    client:
+      organization: aggregator
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/aggregator
+        cryptoStore:
+          path: tmp/hfc-kvs/aggregator
+      clientPrivateKey:
+        path: ../fabric-ca/aggregator/clients/aggregator-client/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../fabric-ca/aggregator/clients/aggregator-client/msp/signcerts/cert.pem
+  spv-client:
+    client:
+      organization: spv
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/spv
+        cryptoStore:
+          path: tmp/hfc-kvs/spv
+      clientPrivateKey:
+        path: ../fabric-ca/spv/clients/spv-client/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../fabric-ca/spv/clients/spv-client/msp/signcerts/cert.pem
+  underwritter-client:
+    client:
+      organization: underwritter
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/underwritter
+        cryptoStore:
+          path: tmp/hfc-kvs/underwritter
+      clientPrivateKey:
+        path: ../fabric-ca/underwritter/clients/underwritter-client/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../fabric-ca/underwritter/clients/underwritter-client/msp/signcerts/cert.pem
+
+peers:
+  originator-peer:
+    url: grpcs://localhost:7051
+    tlsCACerts:
+      path: ../fabric-ca/originator/peers/originator-peer/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: originator-peer
+      hostnameOverride: originator-peer
+      grpc.keepalive_time_ms: 600000
+  farmer-peer:
+    url: grpcs://localhost:8051
+    tlsCACerts:
+      path: ../fabric-ca/farmer/peers/farmer-peer/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: farmer-peer
+      hostnameOverride: farmer-peer
+      grpc.keepalive_time_ms: 600000
+  aggregator-peer:
+    url: grpcs://localhost:9051
+    tlsCACerts:
+      path: ../fabric-ca/aggregator/peers/aggregator-peer/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: aggregator-peer
+      hostnameOverride: aggregator-peer
+      grpc.keepalive_time_ms: 600000
+  spv-peer:
+    url: grpcs://localhost:10051
+    tlsCACerts:
+      path: ../fabric-ca/spv/peers/spv-peer/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: spv-peer
+      hostnameOverride: spv-peer
+      grpc.keepalive_time_ms: 600000
+  underwritter-peer:
+    url: grpcs://localhost:11051
+    tlsCACerts:
+      path: ../fabric-ca/underwritter/peers/underwritter-peer/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: underwritter-peer
+      hostnameOverride: underwritter-peer
+      grpc.keepalive_time_ms: 600000
+orderers:
+  originator-orderer:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: originator-orderer
+    tlsCACerts:
+      path: ../fabric-ca/originator/orderers/originator-orderer/tls/ca.crt
+  farmer-orderer:
+    url: grpcs://localhost:8050
+    grpcOptions:
+      ssl-target-name-override: farmer-orderer
+    tlsCACerts:
+      path: ../fabric-ca/farmer/orderers/farmer-orderer/tls/ca.crt
+  aggregator-orderer:
+    url: grpcs://localhost:9050
+    grpcOptions:
+      ssl-target-name-override: aggregator-orderer
+    tlsCACerts:
+      path: ../fabric-ca/aggregator/orderers/aggregator-orderer/tls/ca.crt
+  spv-orderer:
+    url: grpcs://localhost:10050
+    grpcOptions:
+      ssl-target-name-override: spv-orderer
+    tlsCACerts:
+      path: ../fabric-ca/spv/orderers/spv-orderer/tls/ca.crt
+  underwritter-orderer:
+    url: grpcs://localhost:11050
+    grpcOptions:
+      ssl-target-name-override: underwritter-orderer
+    tlsCACerts:
+      path: ../fabric-ca/underwritter/orderers/underwritter-orderer/tls/ca.crt
+
+
+
+#certificateAuthorities:
+#  int.ca.org1.acme.com:
+#    url: http://localhost:7056
+#    caName: int.ca.org1.acme.com
+#    #tlsCACerts:
+#    #  pem:
+#    #    - |
+#    #      ${CAPEM}
+#    httpOptions:
+#      verify: false
+
